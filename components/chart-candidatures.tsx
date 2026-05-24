@@ -11,11 +11,18 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 
 const chartConfig = {
   total: {
@@ -24,11 +31,33 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+import { BarChart2Icon } from "lucide-react"
+
 export function ChartCandidatures({
   data,
 }: {
   data: { day: string; total: number }[]
 }) {
+  const isEmpty = data.every((d) => d.total === 0)
+
+  if (isEmpty) {
+    return (
+        <Card>
+            <Empty>
+                <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                        <BarChart2Icon />
+                    </EmptyMedia>
+                    <EmptyTitle className="text-l">Aucune candidature cette semaine</EmptyTitle>
+                    <EmptyDescription>
+                        Vous n'avez pas envoyé de candidature ces 7 derniers jours.
+                    </EmptyDescription>
+                </EmptyHeader>
+            </Empty>
+        </Card>
+    )
+  }
+
   return (
     <Card>
         <CardHeader>
