@@ -15,13 +15,14 @@ async function getData(): Promise<Candidatures[]> {
 }
 
 export default async function Page() {
-  const data = await getData()
+    const data = await getData()
 
-  return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="min-h-screen flex-1 md:min-h-min">
-        <DataTable columns={columns} data={data} />
-      </div>
-    </div>
-  )
+    return (
+        <div className="flex flex-1 flex-col gap-4 p-4">
+            <h1 className="pt-3 text-3xl font-bold tracking-tight">Mes candidatures</h1>
+            <div className="min-h-screen flex-1 md:min-h-min">
+                <DataTable columns={columns} data={data} />
+            </div>
+        </div>
+    )
 }

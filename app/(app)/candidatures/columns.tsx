@@ -72,20 +72,21 @@ function ActionsCell({ row }: { row: { original: Candidatures } }) {
                 Supprimer
               </DropdownMenuItem>
             </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
+            <AlertDialogContent size="sm">
+                <AlertDialogHeader>
+                <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                    <Trash2Icon />
+                </AlertDialogMedia>
                 <AlertDialogTitle>Supprimer la candidature ?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Cette action est irréversible. La candidature chez{" "}
-                  <strong>{candidature.entreprise}</strong> sera définitivement supprimée.
+                    Cette action est irréversible. La candidature chez{" "}
+                    <strong>{candidature.entreprise}</strong> sera définitivement supprimée.
                 </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                <AlertDialogAction onClick={() => deleteCandidature(candidature.id)}>
-                  Supprimer
-                </AlertDialogAction>
-              </AlertDialogFooter>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                <AlertDialogCancel variant="outline">Annuler</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" onClick={() => deleteCandidature(candidature.id)}>Supprimer</AlertDialogAction>
+                </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </DropdownMenuContent>
@@ -96,7 +97,7 @@ function ActionsCell({ row }: { row: { original: Candidatures } }) {
 
 export const columns: ColumnDef<Candidatures>[] = [
   {
-    id: "select",
+    id: "select", size: 25,
     header: ({ table }) => (
       <Checkbox
         checked={
@@ -117,11 +118,12 @@ export const columns: ColumnDef<Candidatures>[] = [
         enableSorting: false,
         enableHiding: false,
     },
-    { accessorKey: "entreprise", header: "Entreprise" },
-    { accessorKey: "poste", header: "Poste" },
+    { accessorKey: "entreprise", header: "Entreprise", size: 130 },
+    { accessorKey: "poste", header: "Poste", size: 200 },
     {
         accessorKey: "statut",
         header: "Statut",
+        size: 80,
         cell: ({ row }) => {
             const statut = row.getValue("statut") as string
 
@@ -140,18 +142,25 @@ export const columns: ColumnDef<Candidatures>[] = [
             )
         },
     },
-  { accessorKey: "lieu", header: "Lieu" },
+  { accessorKey: "lieu", header: "Lieu", size: 130 },
   {
     accessorKey: "date",
     header: "Date",
+    size: 100,
     cell: ({ row }) => {
       const date = row.getValue("date") as string
       if (!date) return "-"
       return new Date(date).toLocaleDateString("fr-FR")
     },
   },
-  {
+    {
     id: "actions",
-    cell: ({ row }) => <ActionsCell row={row} />,
-  },
+    size: 50,
+    header: () => <div className="text-right" />,
+    cell: ({ row }) => (
+        <div className="flex justify-end">
+        <ActionsCell row={row} />
+        </div>
+    ),
+    },
 ]
