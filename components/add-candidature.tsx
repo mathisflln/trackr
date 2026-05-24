@@ -38,10 +38,17 @@ import { addCandidature } from "@/app/auth/actions"
 
 export function AddCandidature() {
     const [open, setOpen] = React.useState(false)
+    const [dialogOpen, setDialogOpen] = React.useState(false)
     const [date, setDate] = React.useState<Date | undefined>(undefined)
 
+    async function handleSubmit(formData: FormData) {
+        await addCandidature(formData)
+        setDialogOpen(false)
+        setDate(undefined)
+    }
+
     return (
-        <Dialog>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
             <Button><PlusIcon />Ajouter</Button>
         </DialogTrigger>
@@ -113,7 +120,7 @@ export function AddCandidature() {
                 <DialogClose asChild>
                 <Button variant="outline">Retour</Button>
                 </DialogClose>
-                <Button type="submit" formAction={addCandidature}>Enregistrer</Button>
+                <Button type="submit" formAction={handleSubmit}>Enregistrer</Button>
             </DialogFooter>
             </form>
         </DialogContent>
