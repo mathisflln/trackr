@@ -6,6 +6,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { MoreHorizontal, Trash2Icon } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -94,19 +95,39 @@ export const columns: ColumnDef<Candidatures>[] = [
         aria-label="Select all"
       />
     ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  { accessorKey: "entreprise", header: "Entreprise" },
-  { accessorKey: "poste", header: "Poste" },
-  { accessorKey: "statut", header: "Statut" },
+        cell: ({ row }) => (
+        <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+        />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    { accessorKey: "entreprise", header: "Entreprise" },
+    { accessorKey: "poste", header: "Poste" },
+    {
+        accessorKey: "statut",
+        header: "Statut",
+        cell: ({ row }) => {
+            const statut = row.getValue("statut") as string
+
+            const colors: Record<string, string> = {
+                "Postulé": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+                "Entretien": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+                "Refusé": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+                "Accepté": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+                "Ghosté": "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+            }
+
+            return (
+                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${colors[statut] ?? ""}`}>
+                    {statut}
+                </span>
+            )
+        },
+    },
   { accessorKey: "lieu", header: "Lieu" },
   {
     accessorKey: "date",

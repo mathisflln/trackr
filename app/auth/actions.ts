@@ -73,7 +73,7 @@ export async function addCandidature(formData: FormData): Promise<void> {
     description: formData.get("description") as string,
     lieu: formData.get("lieu") as string,
     lien: formData.get("lien") as string,
-    statut: "Postulé",
+    statut: formData.get("statut") as string,
     date: formData.get("date") as string,
   })
 
@@ -81,7 +81,6 @@ export async function addCandidature(formData: FormData): Promise<void> {
 
   revalidatePath("/candidatures")
 }
-
 
 export async function deleteCandidature(id: string): Promise<void> {
   const supabase = await createClient()

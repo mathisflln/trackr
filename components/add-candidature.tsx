@@ -18,6 +18,16 @@ import {
 } from "@/components/ui/dialog"
 
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -61,24 +71,44 @@ export function AddCandidature() {
                 <Label htmlFor="lien">Lien de l'offre</Label>
                 <Input id="lien" name="lien" />
             </Field>
-            <Field>
-                <Label htmlFor="date">Date de candidature</Label>
-                <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                        <Button variant="outline" id="date" className="justify-start font-normal">{date ? date.toLocaleDateString() : "Sélectionner une date"}</Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={(date) => {
-                            setDate(date)
-                            setOpen(false)
-                            }}
-                        />
-                    </PopoverContent>
-                </Popover>
-            </Field>
+            <div>
+                <Field>
+                    <Label htmlFor="date">Date de candidature</Label>
+                    <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" id="date" className="justify-start font-normal">{date ? date.toLocaleDateString() : "Sélectionner une date"}</Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={date}
+                                onSelect={(date) => {
+                                setDate(date)
+                                setOpen(false)
+                                }}
+                            />
+                        </PopoverContent>
+                    </Popover>
+                </Field>
+                <Field>
+                    <Label htmlFor="statut">Statut</Label>
+                    <Select name="statut" defaultValue="Postulé">
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                            <SelectItem value="Postulé">Postulé</SelectItem>
+                            <SelectItem value="Entretien">Entretien</SelectItem>
+                            <SelectItem value="Refusé">Refusé</SelectItem>
+                            <SelectItem value="Accepté">Accepté</SelectItem>
+                            <SelectItem value="Ghosté">Ghosté</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </Field>
+            </div>
+            <input type="hidden" name="date" value={date ? date.toISOString().split("T")[0] : ""} />
             <DialogFooter className="mt-4">
                 <DialogClose asChild>
                 <Button variant="outline">Retour</Button>
