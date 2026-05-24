@@ -2,19 +2,32 @@
 
 import React from "react"
 
+import { ReadCandidature } from "@/components/read-candidature"
+import { UpdateCandidature } from "@/components/update-candidature"
 import { deleteCandidature } from "@/app/auth/actions"
 
 import { ColumnDef } from "@tanstack/react-table"
+import {
+  IconLoader,
+  IconMessage,
+  IconCircleXFilled,
+  IconCircleCheckFilled,
+  IconGhost,
+} from "@tabler/icons-react"
+
 import { MoreHorizontal, Trash2Icon } from "lucide-react"
+
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,9 +38,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-  AlertDialogMedia
+  AlertDialogMedia,
 } from "@/components/ui/alert-dialog"
-import { UpdateCandidature } from "@/components/update-candidature"
 
 export type Candidatures = {
   id: string
@@ -43,50 +55,102 @@ export type Candidatures = {
   created_at: string
 }
 
-function ActionsCell({ row }: { row: { original: Candidatures } }) {
-  const candidature = row.original
-  const [updateOpen, setUpdateOpen] = React.useState(false)
+const statutConfig = {
+  Postulé: {
+    label: "Postulé",
+    icon: IconLoader,
+    iconClass: "",
+    variant: "outline",
+  },
+  Entretien: {
+    label: "Entretien",
+    icon: IconMessage,
+    iconClass: "text-yellow-500 dark:text-yellow-400",
+    variant: "outline",
+  },
+  Refusé: {
+    label: "Refusé",
+    icon: IconCircleXFilled,
+    iconClass: "fill-red-500 dark:fill-red-400",
+    variant: "destructive",
+  },
+  Accepté: {
+    label: "Accepté",
+    icon: IconCircleCheckFilled,
+    iconClass: "fill-green-500 dark:fill-green-400",
+    variant: "outline",
+  },
+  Ghosté: {
+    label: "Ghosté",
+    icon: IconGhost,
+    iconClass: "text-gray-500 dark:text-gray-400",
+    variant: "outline",
+  },
+} as const
 
-  return (
+function ActionsCell({ row }: { row: { original: Candidatures } }) {
+    const candidature = row.original
+    const [updateOpen, setUpdateOpen] = React.useState(false)
+    const [readOpen, setReadOpen] = React.useState(false)
+
+    return (
     <>
-      <UpdateCandidature
-        candidature={candidature}
-        open={updateOpen}
-        onOpenChange={setUpdateOpen}
-      />
+        <ReadCandidature
+            candidature={candidature}
+            open={readOpen}
+            onOpenChange={setReadOpen}
+        />
+        <UpdateCandidature
+            candidature={candidature}
+            open={updateOpen}
+            onOpenChange={setUpdateOpen}
+        />
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
+
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>Détails</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setUpdateOpen(true)}>
-            Modifier
-          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setReadOpen(true)}>Détails</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setUpdateOpen(true)}>Modifier</DropdownMenuItem>
+
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <DropdownMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
+              <DropdownMenuItem
+                className="text-red-600"
+                onSelect={(e) => e.preventDefault()}
+              >
                 Supprimer
               </DropdownMenuItem>
             </AlertDialogTrigger>
+
             <AlertDialogContent size="sm">
-                <AlertDialogHeader>
+              <AlertDialogHeader>
                 <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                    <Trash2Icon />
+                  <Trash2Icon />
                 </AlertDialogMedia>
-                <AlertDialogTitle>Supprimer la candidature ?</AlertDialogTitle>
+
+                <AlertDialogTitle>
+                  Supprimer la candidature ?
+                </AlertDialogTitle>
+
                 <AlertDialogDescription>
-                    Cette action est irréversible. La candidature chez{" "}
-                    <strong>{candidature.entreprise}</strong> sera définitivement supprimée.
+                  Cette action est irréversible. La candidature chez{" "}
+                  <strong>{candidature.entreprise}</strong> sera supprimée.
                 </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                <AlertDialogCancel variant="outline">Annuler</AlertDialogCancel>
-                <AlertDialogAction variant="destructive" onClick={() => deleteCandidature(candidature.id)}>Supprimer</AlertDialogAction>
-                </AlertDialogFooter>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => deleteCandidature(candidature.id)}
+                >
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </DropdownMenuContent>
@@ -97,70 +161,87 @@ function ActionsCell({ row }: { row: { original: Candidatures } }) {
 
 export const columns: ColumnDef<Candidatures>[] = [
   {
-    id: "select", size: 25,
+    id: "select",
+    size: 25,
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        onCheckedChange={(value) =>
+          table.toggleAllPageRowsSelected(!!value)
+        }
       />
     ),
-        cell: ({ row }) => (
-        <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-        />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    { accessorKey: "entreprise", header: "Entreprise", size: 130 },
-    { accessorKey: "poste", header: "Poste", size: 200 },
-    {
-        accessorKey: "statut",
-        header: "Statut",
-        size: 80,
-        cell: ({ row }) => {
-            const statut = row.getValue("statut") as string
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+  },
 
-            const colors: Record<string, string> = {
-                "Postulé": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-                "Entretien": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-                "Refusé": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-                "Accepté": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-                "Ghosté": "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-            }
+  {
+    accessorKey: "entreprise",
+    header: "Entreprise",
+    size: 130,
+  },
 
-            return (
-                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${colors[statut] ?? ""}`}>
-                    {statut}
-                </span>
-            )
-        },
-    },
-  { accessorKey: "lieu", header: "Lieu", size: 130 },
+  {
+    accessorKey: "poste",
+    header: "Poste",
+    size: 200,
+  },
+
+  {
+    accessorKey: "statut",
+    header: "Statut",
+    size: 90,
+    cell: ({ row }) => {
+    const statut =
+        row.getValue("statut") as keyof typeof statutConfig
+
+    const config = statutConfig[statut]
+    const Icon = config.icon
+
+    return (
+        <Badge
+        variant={config.variant}
+        className="flex items-center gap-1"
+        >
+        <Icon className={`h-3.5 w-3.5 ${config.iconClass}`} />
+        {config.label}
+        </Badge>
+    )
+    }
+  },
+
+  {
+    accessorKey: "lieu",
+    header: "Lieu",
+    size: 140,
+  },
+
   {
     accessorKey: "date",
     header: "Date",
-    size: 100,
+    size: 80,
     cell: ({ row }) => {
       const date = row.getValue("date") as string
       if (!date) return "-"
       return new Date(date).toLocaleDateString("fr-FR")
     },
   },
-    {
+
+  {
     id: "actions",
     size: 50,
     header: () => <div className="text-right" />,
     cell: ({ row }) => (
-        <div className="flex justify-end">
+      <div className="flex justify-end">
         <ActionsCell row={row} />
-        </div>
+      </div>
     ),
-    },
+  },
 ]
