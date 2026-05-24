@@ -2,6 +2,8 @@ import { columns, Candidatures } from "../candidatures/columns"
 import { DataTable } from "../candidatures/data-table"
 import { createClient } from "@/lib/supabase/server"
 
+import { Card } from "@/components/ui/card"
+
 import { ChartCandidatures } from "@/components/chart-candidatures"
 
 async function getRecentData(): Promise<Candidatures[]> {
@@ -55,22 +57,22 @@ export default async function Page() {
     <div className="flex flex-1 flex-col gap-4 p-4">
       <h1 className="pt-3 text-2xl font-bold tracking-tight">Bonjour {name}</h1>
       <div className="grid auto-rows-min gap-4 md:grid-cols-4">
-        <div className="aspect-video rounded-xl bg-muted/50 p-4">
+        <Card className="rounded-xl bg-muted/50 p-4 gap-0">
           <h2 className="text-5xl font-bold tracking-tighter">{totalCandidatures ?? 0}</h2>
           <p className="text-sm text-muted-foreground mt-1">candidatures</p>
-        </div>
-        <div className="aspect-video rounded-xl bg-muted/50 p-4">
+        </Card>
+        <Card className="rounded-xl bg-muted/50 p-4 gap-0">
         <h2 className="text-5xl font-bold tracking-tighter">
           {totalCandidatures ? Math.round(((reponses ?? 0) / totalCandidatures) * 100) : 0}%
         </h2>
           <p className="text-sm text-muted-foreground mt-1">de réponses</p>
-        </div>
-        <div className="aspect-video rounded-xl bg-muted/50" />
-        <div className="aspect-video rounded-xl bg-muted/50" />
+        </Card>
+        <Card className="rounded-xl bg-muted/50 gap-0" />
+        <Card className="rounded-xl bg-muted/50 gap-0" />
       </div>
       <div className="grid auto-rows-min gap-4 md:grid-cols-2">
         <ChartCandidatures data={chartData} />
-        <div className="aspect-video rounded-xl bg-muted/50 p-4"></div>
+        <Card className="rounded-xl bg-muted/50 p-4"></Card>
       </div>
       <h2 className="text-lg font-medium">Candidatures récentes</h2>
       <DataTable columns={columns} data={data} showToolbar={false} />
