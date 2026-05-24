@@ -2,6 +2,8 @@ import { columns, Candidatures } from "../candidatures/columns"
 import { DataTable } from "../candidatures/data-table"
 import { createClient } from "@/lib/supabase/server"
 
+import { ChartCandidatures } from "@/components/chart-candidatures"
+
 async function getRecentData(): Promise<Candidatures[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -22,7 +24,7 @@ export default async function Page() {
 
   const name = profil?.prenom ?? user?.email ?? "vous"
 
-  const { count: total } = await supabase
+  const { count: totalCandidatures } = await supabase
     .from("candidatures").select("*", { count: "exact", head: true }).eq("user_id", user!.id)
 
   const { count: reponses } = await supabase
@@ -31,22 +33,44 @@ export default async function Page() {
 
   const data = await getRecentData()
 
+  const { data: candidaturesParDate } = await supabase
+    .from("candidatures")
+    .select("date")
+    .eq("user_id", user!.id)
+    .not("date", "is", null)
+    .gte("date", new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split("T")[0])
+
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() - (6 - i))
+    return d.toISOString().split("T")[0]
+  })
+
+  const chartData = last7Days.map((day) => ({
+    day: new Date(day).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric" }),
+    total: (candidaturesParDate ?? []).filter((c) => c.date === day).length,
+  }))
+
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
       <h1 className="pt-3 text-2xl font-bold tracking-tight">Bonjour {name}</h1>
       <div className="grid auto-rows-min gap-4 md:grid-cols-4">
         <div className="aspect-video rounded-xl bg-muted/50 p-4">
-          <h2 className="text-5xl font-bold tracking-tighter">{total ?? 0}</h2>
+          <h2 className="text-5xl font-bold tracking-tighter">{totalCandidatures ?? 0}</h2>
           <p className="text-sm text-muted-foreground mt-1">candidatures</p>
         </div>
         <div className="aspect-video rounded-xl bg-muted/50 p-4">
-          <h2 className="text-5xl font-bold tracking-tighter">
-            {total ? Math.round(((reponses ?? 0) / total) * 100) : 0}%
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">ont eu une réponse</p>
+        <h2 className="text-5xl font-bold tracking-tighter">
+          {totalCandidatures ? Math.round(((reponses ?? 0) / totalCandidatures) * 100) : 0}%
+        </h2>
+          <p className="text-sm text-muted-foreground mt-1">de réponses</p>
         </div>
         <div className="aspect-video rounded-xl bg-muted/50" />
         <div className="aspect-video rounded-xl bg-muted/50" />
+      </div>
+      <div className="grid auto-rows-min gap-4 md:grid-cols-2">
+        <ChartCandidatures data={chartData} />
+        <div className="aspect-video rounded-xl bg-muted/50 p-4"></div>
       </div>
       <h2 className="text-lg font-medium">Candidatures récentes</h2>
       <DataTable columns={columns} data={data} showToolbar={false} />
