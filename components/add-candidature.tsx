@@ -115,7 +115,7 @@ export function AddCandidature() {
                     </Select>
                 </Field>
             </div>
-            <input type="hidden" name="date" value={date ? date.toISOString().split("T")[0] : ""} />
+            <input type="hidden" name="date" value={date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}` : ""} />
             <DialogFooter className="mt-4">
                 <DialogClose asChild>
                 <Button variant="outline">Retour</Button>
