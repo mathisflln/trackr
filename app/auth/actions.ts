@@ -33,13 +33,21 @@ export async function login(formData: FormData): Promise<void> {
 export async function signup(formData: FormData): Promise<void> {
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: formData.get("email") as string,
     password: formData.get("password") as string,
   })
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent(traduireErreur(error.message))}`)
+    redirect(`/signup?error=${encodeURIComponent(traduireErreur(error.message))}`)
+  }
+
+  if (data.user) {
+    await supabase.from("profils").insert({
+      id: data.user.id,
+      prenom: formData.get("firstname") as string,
+      nom: formData.get("lastname") as string,
+    })
   }
 
   redirect("/dashboard")
@@ -68,6 +76,20 @@ export async function addCandidature(formData: FormData): Promise<void> {
     statut: "Postulé",
     date: formData.get("date") as string,
   })
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath("/candidatures")
+}
+
+
+export async function deleteCandidature(id: string): Promise<void> {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from("candidatures")
+    .delete()
+    .eq("id", id)
 
   if (error) throw new Error(error.message)
 

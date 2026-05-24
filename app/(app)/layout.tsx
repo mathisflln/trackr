@@ -10,10 +10,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!user) redirect("/login")
 
+  const { data: profil, error: profilError } = await supabase
+    .from("profils")
+    .select("*")
+    .eq("id", user.id)
+    .single()
+
+    console.log("profil:", profil)
+console.log("profilError:", profilError)
+
   const userData = {
-    name: user.user_metadata?.full_name ?? user.email ?? "Utilisateur",
+    name: profil ? `${profil.prenom} ${profil.nom}` : user.email ?? "Utilisateur",
     email: user.email ?? "",
-    avatar: user.user_metadata?.avatar_url ?? "",
+    avatar: profil?.avatar_url ?? "",
   }
 
   return (

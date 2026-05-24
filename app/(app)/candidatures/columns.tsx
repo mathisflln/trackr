@@ -1,98 +1,124 @@
 "use client"
 
+import { deleteCandidature } from "@/app/auth/actions"
+
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, Trash2Icon } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  AlertDialogMedia
+} from "@/components/ui/alert-dialog"
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
 export type Candidatures = {
-    id: string
-    user_id: string
-    entreprise: string
-    poste: string
-    statut: "Postulé" | "Entretien" | "Refusé" | "Accepté" | "Ghosté"
-    lieu: string
-    contact: string
-    lien: string
-    date: string
-    description: string
-    created_at: string
+  id: string
+  user_id: string
+  entreprise: string
+  poste: string
+  statut: "Postulé" | "Entretien" | "Refusé" | "Accepté" | "Ghosté"
+  lieu: string
+  contact: string
+  lien: string
+  date: string
+  description: string
+  created_at: string
+}
+
+function ActionsCell({ row }: { row: { original: Candidatures } }) {
+  const candidature = row.original
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem>Détails</DropdownMenuItem>
+        <DropdownMenuItem>Modifier</DropdownMenuItem>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <DropdownMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
+              Supprimer
+            </DropdownMenuItem>
+          </AlertDialogTrigger>
+              <AlertDialogContent size="sm">
+            <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                <Trash2Icon />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Supprimer la candidature ?</AlertDialogTitle>
+            <AlertDialogDescription>
+                Cette action est irréversible. La candidature chez{" "}
+                <strong>{candidature.entreprise}</strong> sera définitivement supprimée.
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel variant="outline">Annuler</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={() => deleteCandidature(candidature.id)}>Supprimer</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+        </AlertDialog>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }
 
 export const columns: ColumnDef<Candidatures>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-        <Checkbox
-            checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-        />
-        ),
-        cell: ({ row }) => (
-        <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-        />
-        ),
-        enableSorting: false,
-        enableHiding: false,
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  { accessorKey: "entreprise", header: "Entreprise" },
+  { accessorKey: "poste", header: "Poste" },
+  { accessorKey: "statut", header: "Statut" },
+  { accessorKey: "lieu", header: "Lieu" },
+  {
+    accessorKey: "date",
+    header: "Date",
+    cell: ({ row }) => {
+      const date = row.getValue("date") as string
+      if (!date) return "-"
+      return new Date(date).toLocaleDateString("fr-FR")
     },
-    {
-        accessorKey: "entreprise",
-        header: "Entreprise",
-    },
-    {
-        accessorKey: "poste",
-        header: "Poste",
-    },
-    {
-        accessorKey: "statut",
-        header: "Statut",
-    },
-    {
-        accessorKey: "lieu",
-        header: "Lieu",
-    },
-    {
-        accessorKey: "date",
-        header: "Date",
-    },
-    {
-        id: "actions",
-        cell: ({ row }) => {
-        const payment = row.original
-    
-        return (
-            <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal className="h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem>Détails</DropdownMenuItem>
-                <DropdownMenuItem>Modifier</DropdownMenuItem>
-                <DropdownMenuItem variant="destructive">Supprimer</DropdownMenuItem>
-            </DropdownMenuContent>
-            </DropdownMenu>
-        )
-        },
-    }
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <ActionsCell row={row} />,
+  },
 ]
