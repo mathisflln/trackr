@@ -1,5 +1,7 @@
 "use client"
 
+import React from "react"
+
 import { deleteCandidature } from "@/app/auth/actions"
 
 import { ColumnDef } from "@tanstack/react-table"
@@ -25,6 +27,7 @@ import {
   AlertDialogTrigger,
   AlertDialogMedia
 } from "@/components/ui/alert-dialog"
+import { UpdateCandidature } from "@/components/update-candidature"
 
 export type Candidatures = {
   id: string
@@ -42,43 +45,52 @@ export type Candidatures = {
 
 function ActionsCell({ row }: { row: { original: Candidatures } }) {
   const candidature = row.original
+  const [updateOpen, setUpdateOpen] = React.useState(false)
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem>Détails</DropdownMenuItem>
-        <DropdownMenuItem>Modifier</DropdownMenuItem>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <DropdownMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
-              Supprimer
-            </DropdownMenuItem>
-          </AlertDialogTrigger>
-              <AlertDialogContent size="sm">
-            <AlertDialogHeader>
-            <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                <Trash2Icon />
-            </AlertDialogMedia>
-            <AlertDialogTitle>Supprimer la candidature ?</AlertDialogTitle>
-            <AlertDialogDescription>
-                Cette action est irréversible. La candidature chez{" "}
-                <strong>{candidature.entreprise}</strong> sera définitivement supprimée.
-            </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-            <AlertDialogCancel variant="outline">Annuler</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={() => deleteCandidature(candidature.id)}>Supprimer</AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-        </AlertDialog>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <UpdateCandidature
+        candidature={candidature}
+        open={updateOpen}
+        onOpenChange={setUpdateOpen}
+      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem>Détails</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setUpdateOpen(true)}>
+            Modifier
+          </DropdownMenuItem>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
+                Supprimer
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Supprimer la candidature ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Cette action est irréversible. La candidature chez{" "}
+                  <strong>{candidature.entreprise}</strong> sera définitivement supprimée.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={() => deleteCandidature(candidature.id)}>
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   )
 }
 

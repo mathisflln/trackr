@@ -82,6 +82,32 @@ export async function addCandidature(formData: FormData): Promise<void> {
   revalidatePath("/candidatures")
 }
 
+export async function updateCandidature(formData: FormData): Promise<void> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) redirect("/login")
+
+  const { error } = await supabase
+    .from("candidatures")
+    .update({
+      entreprise: formData.get("entreprise") as string,
+      poste: formData.get("poste") as string,
+      description: formData.get("description") as string,
+      lieu: formData.get("lieu") as string,
+      lien: formData.get("lien") as string,
+      statut: formData.get("statut") as string,
+      date: formData.get("date") as string,
+    })
+    .eq("id", formData.get("id") as string)
+    .eq("user_id", user.id)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath("/candidatures")
+}
+
 export async function deleteCandidature(id: string): Promise<void> {
   const supabase = await createClient()
 
