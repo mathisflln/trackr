@@ -78,8 +78,8 @@ export function AddCandidature() {
                 <Label htmlFor="lien">Lien de l'offre</Label>
                 <Input id="lien" name="lien" />
             </Field>
-            <div>
-                <Field>
+            <div className="flex gap-4">
+                <Field className="flex-1">
                     <Label htmlFor="date">Date de candidature</Label>
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
@@ -97,7 +97,7 @@ export function AddCandidature() {
                         </PopoverContent>
                     </Popover>
                 </Field>
-                <Field>
+                <Field className="flex-1">
                     <Label htmlFor="statut">Statut</Label>
                     <Select name="statut" defaultValue="Postulé">
                         <SelectTrigger>
