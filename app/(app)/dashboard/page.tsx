@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Card } from "@/components/ui/card"
 import { ChartCandidatures } from "@/components/chart-candidatures"
 import { ChartStatuts } from "@/components/chart-statuts"
+import { AlertCampagnes } from "@/components/alert-campagnes"
 
 export default async function Page() {
   const supabase = await createClient()
@@ -60,19 +61,22 @@ export default async function Page() {
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
       <h1 className="pt-3 text-2xl font-bold tracking-tight">Bonjour {name}</h1>
-      <div className="grid auto-rows-min gap-4 md:grid-cols-4">
-        <Card className="rounded-xl bg-muted/50 p-4 gap-0">
-          <h2 className="text-5xl font-bold tracking-tighter">{totalCandidatures ?? 0}</h2>
-          <p className="text-sm text-muted-foreground mt-1">candidatures</p>
+      <div className="grid auto-rows-min gap-4 md:grid-cols-2">
+        <div className="grid auto-rows-min gap-4 md:grid-cols-2">
+          <Card className="rounded-xl bg-muted/50 p-4 gap-0">
+            <h2 className="text-5xl font-bold tracking-tighter">{totalCandidatures ?? 0}</h2>
+            <p className="text-sm text-muted-foreground mt-1">candidatures</p>
+          </Card>
+          <Card className="rounded-xl bg-muted/50 p-4 gap-0">
+            <h2 className="text-5xl font-bold tracking-tighter">
+              {totalCandidatures ? Math.round(((reponses ?? 0) / totalCandidatures) * 100) : 0}%
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">de réponses</p>
+          </Card>
+        </div>
+        <Card className="rounded-xl bg-muted/50 gap-0">
+          <AlertCampagnes />
         </Card>
-        <Card className="rounded-xl bg-muted/50 p-4 gap-0">
-          <h2 className="text-5xl font-bold tracking-tighter">
-            {totalCandidatures ? Math.round(((reponses ?? 0) / totalCandidatures) * 100) : 0}%
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">de réponses</p>
-        </Card>
-        <Card className="rounded-xl bg-muted/50 gap-0" />
-        <Card className="rounded-xl bg-muted/50 gap-0" />
       </div>
       <div className="grid auto-rows-min gap-4 md:grid-cols-2">
         <ChartCandidatures data={chartData} />
