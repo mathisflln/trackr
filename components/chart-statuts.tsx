@@ -12,7 +12,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -40,15 +39,17 @@ export function ChartStatuts({
 
   if (isEmpty) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <PieChartIcon />
-          </EmptyMedia>
-          <EmptyTitle>Aucune donnée</EmptyTitle>
-          <EmptyDescription>Ajoutez des candidatures pour voir la répartition.</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <Card>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <PieChartIcon />
+            </EmptyMedia>
+            <EmptyTitle>Aucune donnée</EmptyTitle>
+            <EmptyDescription>Ajoutez des candidatures pour voir la répartition.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      </Card>
     )
   }
 
