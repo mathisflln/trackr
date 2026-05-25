@@ -11,13 +11,13 @@ import {
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -48,7 +48,7 @@ export function ChartCandidatures({
                     <EmptyMedia variant="icon">
                         <BarChart2Icon />
                     </EmptyMedia>
-                    <EmptyTitle className="text-l">Aucune candidature cette semaine</EmptyTitle>
+                    <EmptyTitle>Aucune candidature cette semaine</EmptyTitle>
                     <EmptyDescription>
                         Vous n'avez pas envoyé de candidature ces 7 derniers jours.
                     </EmptyDescription>
@@ -59,11 +59,11 @@ export function ChartCandidatures({
   }
 
   return (
-    <Card>
-        <CardHeader>
+    <Card className="flex flex-col">
+        <CardHeader className="items-center pb-0">
             <CardTitle>Vos candidatures cette semaine</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 pb-0">
             <ChartContainer config={chartConfig}>
                 <BarChart accessibilityLayer data={data}>
                     <CartesianGrid vertical={false} />
@@ -73,6 +73,14 @@ export function ChartCandidatures({
                 </BarChart>
             </ChartContainer>
         </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+            <div className="flex items-center gap-2 leading-none font-medium">
+            Total
+            </div>
+            <div className="leading-none text-muted-foreground">
+            N'oubliez pas de postuler tous les jours !
+            </div>
+        </CardFooter>
     </Card>
   )
 }

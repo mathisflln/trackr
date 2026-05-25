@@ -1,21 +1,9 @@
 import { columns, Candidatures } from "../candidatures/columns"
 import { DataTable } from "../candidatures/data-table"
 import { createClient } from "@/lib/supabase/server"
-
 import { Card } from "@/components/ui/card"
-
 import { ChartCandidatures } from "@/components/chart-candidatures"
-
-async function getRecentData(): Promise<Candidatures[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('candidatures')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(5)
-  if (error) throw new Error(error.message)
-  return (data ?? []) as Candidatures[]
-}
+import { ChartStatuts } from "@/components/chart-statuts"
 
 export default async function Page() {
   const supabase = await createClient()
@@ -33,7 +21,12 @@ export default async function Page() {
     .from("candidatures").select("*", { count: "exact", head: true })
     .eq("user_id", user!.id).not("statut", "eq", "Postulé")
 
-  const data = await getRecentData()
+  const { data: recentData } = await supabase
+    .from('candidatures')
+    .select('*')
+    .eq("user_id", user!.id)
+    .order('created_at', { ascending: false })
+    .limit(5)
 
   const { data: candidaturesParDate } = await supabase
     .from("candidatures")
@@ -53,6 +46,17 @@ export default async function Page() {
     total: (candidaturesParDate ?? []).filter((c) => c.date === day).length,
   }))
 
+  const { data: statutsData } = await supabase
+    .from("candidatures")
+    .select("statut")
+    .eq("user_id", user!.id)
+
+  const statuts = ["Postulé", "Entretien", "Refusé", "Accepté", "Ghosté"]
+  const chartStatuts = statuts.map((statut) => ({
+    statut,
+    total: (statutsData ?? []).filter((c) => c.statut === statut).length,
+  }))
+
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
       <h1 className="pt-3 text-2xl font-bold tracking-tight">Bonjour {name}</h1>
@@ -62,9 +66,9 @@ export default async function Page() {
           <p className="text-sm text-muted-foreground mt-1">candidatures</p>
         </Card>
         <Card className="rounded-xl bg-muted/50 p-4 gap-0">
-        <h2 className="text-5xl font-bold tracking-tighter">
-          {totalCandidatures ? Math.round(((reponses ?? 0) / totalCandidatures) * 100) : 0}%
-        </h2>
+          <h2 className="text-5xl font-bold tracking-tighter">
+            {totalCandidatures ? Math.round(((reponses ?? 0) / totalCandidatures) * 100) : 0}%
+          </h2>
           <p className="text-sm text-muted-foreground mt-1">de réponses</p>
         </Card>
         <Card className="rounded-xl bg-muted/50 gap-0" />
@@ -72,10 +76,10 @@ export default async function Page() {
       </div>
       <div className="grid auto-rows-min gap-4 md:grid-cols-2">
         <ChartCandidatures data={chartData} />
-        <Card className="rounded-xl bg-muted/50 p-4"></Card>
+        <ChartStatuts data={chartStatuts} />
       </div>
       <h2 className="text-lg font-medium">Candidatures récentes</h2>
-      <DataTable columns={columns} data={data} showToolbar={false} />
+      <DataTable columns={columns} data={(recentData ?? []) as Candidatures[]} showToolbar={false} />
     </div>
   )
 }
