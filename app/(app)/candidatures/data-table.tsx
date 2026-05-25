@@ -14,6 +14,10 @@ import {
 import {
   DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Pagination, PaginationContent, PaginationEllipsis,
+  PaginationItem, PaginationLink, PaginationNext, PaginationPrevious,
+} from "@/components/ui/pagination"
 import { AddCandidature } from "@/components/add-candidature"
 
 interface DataTableProps<TData, TValue> {
@@ -43,6 +47,7 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    initialState: { pagination: { pageSize: 15 } },
     state: { sorting, columnFilters, columnVisibility, rowSelection },
   })
 
@@ -76,6 +81,7 @@ export function DataTable<TData, TValue>({
           <AddCandidature />
         </div>
       )}
+
       <div className="overflow-hidden rounded-md border overflow-x-auto">
         <Table className="table-fixed min-w-[800px]">
           <TableHeader>
@@ -110,18 +116,66 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
       {showToolbar && (
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
+        <div className="flex items-center justify-between py-4">
+          <div className="text-sm text-muted-foreground">
             {table.getFilteredSelectedRowModel().rows.length} sur{" "}
             {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
           </div>
-          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            Précédent
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            Suivant
-          </Button>
+          <Pagination className="mx-0 w-auto">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => table.previousPage()}
+                  aria-disabled={!table.getCanPreviousPage()}
+                  className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+
+              {(() => {
+                const current = table.getState().pagination.pageIndex
+                const total = table.getPageCount()
+                const pages: (number | "...")[] = []
+
+                if (total <= 7) {
+                  for (let i = 0; i < total; i++) pages.push(i)
+                } else {
+                  pages.push(0)
+                  if (current > 3) pages.push("...")
+                  for (let i = Math.max(1, current - 1); i <= Math.min(total - 2, current + 1); i++) pages.push(i)
+                  if (current < total - 4) pages.push("...")
+                  pages.push(total - 1)
+                }
+
+                return pages.map((page, i) =>
+                  page === "..." ? (
+                    <PaginationItem key={`ellipsis-${i}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => table.setPageIndex(page)}
+                        isActive={current === page}
+                        className="cursor-pointer"
+                      >
+                        {page + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                )
+              })()}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => table.nextPage()}
+                  aria-disabled={!table.getCanNextPage()}
+                  className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
     </div>
