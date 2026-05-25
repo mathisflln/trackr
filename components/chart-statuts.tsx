@@ -84,10 +84,10 @@ export function ChartStatuts({
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 leading-none font-medium">
-          Trending up by 5.2% this month
+          Taux
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Si vous avez beaucoup de refus, il faut changer votre approche.
         </div>
       </CardFooter>
     </Card>

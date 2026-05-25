@@ -88,23 +88,43 @@ const statutConfig = {
   },
 } as const
 
-function ActionsCell({ row }: { row: { original: Candidatures } }) {
-    const candidature = row.original
-    const [updateOpen, setUpdateOpen] = React.useState(false)
-    const [readOpen, setReadOpen] = React.useState(false)
+function PosteCell({ row }: { row: { original: Candidatures } }) {
+  const [readOpen, setReadOpen] = React.useState(false)
 
-    return (
+  return (
     <>
-        <ReadCandidature
-            candidature={candidature}
-            open={readOpen}
-            onOpenChange={setReadOpen}
-        />
-        <UpdateCandidature
-            candidature={candidature}
-            open={updateOpen}
-            onOpenChange={setUpdateOpen}
-        />
+      <ReadCandidature
+        candidature={row.original}
+        open={readOpen}
+        onOpenChange={setReadOpen}
+      />
+      <button
+        onClick={() => setReadOpen(true)}
+        className="text-left hover:underline underline-offset-2 text-sm font-medium"
+      >
+        {row.original.poste}
+      </button>
+    </>
+  )
+}
+
+function ActionsCell({ row }: { row: { original: Candidatures } }) {
+  const candidature = row.original
+  const [updateOpen, setUpdateOpen] = React.useState(false)
+  const [readOpen, setReadOpen] = React.useState(false)
+
+  return (
+    <>
+      <ReadCandidature
+        candidature={candidature}
+        open={readOpen}
+        onOpenChange={setReadOpen}
+      />
+      <UpdateCandidature
+        candidature={candidature}
+        open={updateOpen}
+        onOpenChange={setUpdateOpen}
+      />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -169,9 +189,7 @@ export const columns: ColumnDef<Candidatures>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value) =>
-          table.toggleAllPageRowsSelected(!!value)
-        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
       />
     ),
     cell: ({ row }) => (
@@ -192,6 +210,7 @@ export const columns: ColumnDef<Candidatures>[] = [
     accessorKey: "poste",
     header: "Poste",
     size: 200,
+    cell: ({ row }) => <PosteCell row={row} />,
   },
 
   {
@@ -199,22 +218,17 @@ export const columns: ColumnDef<Candidatures>[] = [
     header: "Statut",
     size: 90,
     cell: ({ row }) => {
-    const statut =
-        row.getValue("statut") as keyof typeof statutConfig
+      const statut = row.getValue("statut") as keyof typeof statutConfig
+      const config = statutConfig[statut]
+      const Icon = config.icon
 
-    const config = statutConfig[statut]
-    const Icon = config.icon
-
-    return (
-        <Badge
-        variant={config.variant}
-        className="flex items-center gap-1"
-        >
-        <Icon className={`h-3.5 w-3.5 ${config.iconClass}`} />
-        {config.label}
+      return (
+        <Badge variant={config.variant} className="flex items-center gap-1">
+          <Icon className={`h-3.5 w-3.5 ${config.iconClass}`} />
+          {config.label}
         </Badge>
-    )
-    }
+      )
+    },
   },
 
   {
